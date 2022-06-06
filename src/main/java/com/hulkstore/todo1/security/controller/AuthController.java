@@ -47,6 +47,7 @@ public class AuthController {
 	@Autowired
 	JwtProvider jwtProvider;
 	
+	@CrossOrigin(origins = "http://localhost:4200")
 	@PostMapping("/nuevo")
 	public ResponseEntity<?> nuevo(@Valid @RequestBody NuevoUsuario nuevoUsuario, BindingResult bindingResult){
 		if (bindingResult.hasErrors())
@@ -70,6 +71,7 @@ public class AuthController {
 		return new ResponseEntity<Object>(new Mensaje("Usuario guardado"), HttpStatus.CREATED);
 	}
 	
+	@CrossOrigin(origins = "http://localhost:4200")
 	@PostMapping("/login")
 	public ResponseEntity<JwtDto> login (@Valid @RequestBody LoginUsuario loginUsuario, BindingResult bindingResult ){
 		if (bindingResult.hasErrors())

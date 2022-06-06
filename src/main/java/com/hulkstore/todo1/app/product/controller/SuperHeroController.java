@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,7 @@ import com.hulkstore.todo1.helper.FormatMessage;
 
 import org.springframework.validation.BindingResult;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping(value = "/superHero")
 public class SuperHeroController {
@@ -43,6 +45,7 @@ public class SuperHeroController {
 
         return ResponseEntity.ok(superHeros);
     }
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping
     @RequestMapping(value = "/{id}")
     public ResponseEntity<SuperHero> getSuperHero(@PathVariable("id") Long id) {
@@ -55,6 +58,7 @@ public class SuperHeroController {
 
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping
     public ResponseEntity<SuperHero> createSuperHero(@Valid @RequestBody SuperHero superHero, BindingResult result) {
         if (result.hasErrors()) {

@@ -7,6 +7,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.hulkstore.todo1.app.exception.ModelInvoiceException;
 import com.hulkstore.todo1.app.invoice.entity.Invoice;
 import com.hulkstore.todo1.app.invoice.service.InvoiceService;
 import com.hulkstore.todo1.helper.FormatMessage;
@@ -23,6 +24,7 @@ public class InvoiceController {
 
     private FormatMessage message = new FormatMessage();
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping
     public ResponseEntity<List<Invoice>> listAllInvoices() {
         List<Invoice> invoices = invoiceService.findInvoiceAll();
@@ -32,6 +34,7 @@ public class InvoiceController {
         return ResponseEntity.ok(invoices);
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping(value = "/{id}")
     public ResponseEntity<Invoice> getInvoice(@PathVariable("id") long id) {
 
@@ -42,6 +45,7 @@ public class InvoiceController {
         return ResponseEntity.ok(invoice);
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping
     public ResponseEntity<Invoice> createInvoice(@Valid @RequestBody Invoice invoice, BindingResult result) {
         if (result.hasErrors()) {
@@ -49,9 +53,14 @@ public class InvoiceController {
         }
         Invoice invoiceDB = invoiceService.createInvoice(invoice);
 
+        if(invoiceDB == null){
+         throw new ModelInvoiceException("Por favor validar el stock");
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(invoiceDB);
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Invoice> deleteInvoice(@PathVariable("id") long id) {
 

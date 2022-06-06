@@ -84,4 +84,18 @@ public class ProductServiceImp implements ProductService {
         return productRep.save(productDB);
     }
     
+    @Override
+    public boolean stockValidate(Long id, int quantity) {
+        Product productDB = getProduct(id);
+        if (null == productDB){
+            return false;
+        }
+
+        if( (productDB.getStock() - quantity) >= 0){
+            return true;
+        }
+
+        return false;
+    }
+    
 }

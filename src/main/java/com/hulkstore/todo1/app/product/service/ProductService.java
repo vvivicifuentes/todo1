@@ -15,4 +15,5 @@ public interface ProductService {
     public  Product deleteProduct(Long id);
     public List<Product> findBySuperHero(SuperHero name);
     public Product updateStock(Long id, int quantity);
+    public boolean stockValidate(Long id, int quantity);
 }

@@ -2,6 +2,7 @@ package com.hulkstore.todo1.app.invoice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hulkstore.todo1.app.invoice.entity.Invoice;
 import com.hulkstore.todo1.app.invoice.entity.InvoiceItem;
@@ -11,6 +12,7 @@ import com.hulkstore.todo1.app.product.entity.Product;
 import com.hulkstore.todo1.app.product.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,27 +34,32 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public Invoice createInvoice(Invoice invoice) {
         Invoice invoiceDB = invoiceRepository.findByNumberInvoice(invoice.getNumberInvoice());
         if (invoiceDB != null) {
             return invoiceDB;
         }
-        invoice.setState("CREATED");
-        invoiceDB = invoiceRepository.save(invoice);
-        invoiceDB.getItems().forEach(invoiceItem -> {
-            productService.updateStock(invoiceItem.getProductId(), (int) (invoiceItem.getQuantity() * -1));
-        });
+        if (this.stockValidate(invoice)) {
+            invoice.setState("CREATED");
+            invoiceDB = invoiceRepository.save(invoice);
+            invoiceDB.getItems().forEach(invoiceItem -> {
+                productService.updateStock(invoiceItem.getProductId(), (int) (invoiceItem.getQuantity() * -1));
+            });
 
-        return invoiceDB;
+            return invoiceDB;
+        }
+
+        return null;
     }
 
     @Override
     public Invoice deleteInvoice(Invoice invoice) {
         Invoice invoiceDB = getInvoice(invoice.getId());
-        if ( invoiceDB == null || !invoiceDB.getState().equals("CREATED") ) {
+        if (invoiceDB == null || !invoiceDB.getState().equals("CREATED")) {
             return null;
         }
-        
+
         invoiceDB.setState("DELETED");
 
         invoiceDB.getItems().forEach(invoiceItem -> {
@@ -76,5 +83,15 @@ public class InvoiceServiceImpl implements InvoiceService {
             invoice.setItems(listItem);
         }
         return invoice;
+    }
+
+    private boolean stockValidate(Invoice invoice) {
+        for (InvoiceItem item : invoice.getItems()) {
+            if (!productService.stockValidate(item.getProductId(), (int) (item.getQuantity()))) {
+                return false;
+            }
+        }
+        return true;
+
     }
 }
